@@ -1,0 +1,27 @@
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import GradientBoostingClassifier
+
+default_path='D:\experiments\Kaggle\Titanic'
+
+train_data=pd.read_csv(default_path+'\\train.csv',delimiter=',')
+test_data=pd.read_csv(default_path+'\\test.csv',delimiter=',')
+train_x=train_data[['Pclass','Fare','Sex','SibSp','Parch','Embarked']]
+test_x=test_data[['Pclass','Fare','Sex','SibSp','Parch','Embarked']]
+known_y=train_data['Survived']
+
+def preprocess(df):
+    df =pd.get_dummies(df,prefix=['Sex','Embarked'])
+    return df
+		
+train_x = preprocess(train_x)
+test_x = preprocess(test_x)
+
+titanic_fate=GradientBoostingClassifier()
+titanic_fate.fit(train_x,known_y)
+predicts=titanic_fate.predict(test_x)
+predicts_pd=pd.DataFrame()
+predicts_pd['Survived']=predicts
+predicts_pd['PassengerID']=test_data['PassengerId'].dropna()
+
+predicts_pd.to_csv(default_path+'\\results.csv',index=False  )
